@@ -1,0 +1,194 @@
+version: '3'
+services:
+  zookeeper:
+    container_name: zookeeper
+    image: docker.io/bitnami/zookeeper:3.8
+    ports:
+      - "2181:2181"
+    volumes:
+      - "zookeeper_data:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    container_name: kafka
+    image: docker.io/bitnami/kafka:3.4
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_ENABLE_KRAFT=no
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,EXTERNAL://:9094
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+
+    depends_on:
+      - zookeeper
+
+  elasticsearch-kibana:
+    container_name: elasticsearch-kibana
+    image: nshou/elasticsearch-kibana
+    ports:
+      - "9200:9200"
+      - "5601:5601"
+
+  humidity_processor:
+    container_name: humidity_processor
+    image: humidity_processor_image
+    ports:
+      - "8082:8082"
+    environment:
+      - input_topic=weather-events
+      - output_topic=humidity-events
+    depends_on:
+      - kafka
+
+  station1:
+    container_name: station_1
+    image: weather_station_image
+    ports:
+      - "8083:8083"
+    environment:
+      - topic_name=weather-events
+      - station_id=1
+    depends_on:
+      - kafka
+
+  station2:
+    container_name: station_2
+    image: weather_station_image
+    ports:
+      - "8084:8084"
+    environment:
+      - topic_name=weather-events
+      - station_id=2
+    depends_on:
+      - kafka
+
+
+  station3:
+    container_name: station_3
+    image: weather_station_image
+    ports:
+      - "8085:8085"
+    environment:
+      - topic_name=weather-events
+      - station_id=3
+    depends_on:
+      - kafka
+
+  station4:
+    container_name: station_4
+    image: weather_station_image
+    ports:
+      - "8086:8086"
+    environment:
+      - topic_name=weather-events
+      - station_id=4
+    depends_on:
+      - kafka
+
+
+  station5:
+    container_name: station_5
+    image: weather_station_image
+    ports:
+      - "8087:8087"
+    environment:
+      - topic_name=weather-events
+      - station_id=5
+    depends_on:
+      - kafka
+
+  station6:
+    container_name: station_6
+    image: weather_station_image
+    ports:
+      - "8088:8088"
+    environment:
+      - topic_name=weather-events
+      - station_id=6
+    depends_on:
+      - kafka
+
+
+  station7:
+    container_name: station_7
+    image: weather_station_image
+    ports:
+      - "8089:8089"
+    environment:
+      - topic_name=weather-events
+      - station_id=7
+    depends_on:
+      - kafka
+
+  station8:
+    container_name: station_8
+    image: weather_station_image
+    ports:
+      - "8090:8090"
+    environment:
+      - topic_name=weather-events
+      - station_id=8
+    depends_on:
+      - kafka
+
+  station9:
+    container_name: station_9
+    image: weather_station_image
+    ports:
+      - "8091:8091"
+    environment:
+      - topic_name=weather-events
+      - station_id=9
+    depends_on:
+      - kafka
+
+  station10:
+    container_name: station_10
+    image: weather_station_image
+    ports:
+      - "8092:8092"
+    environment:
+      - topic_name=weather-events
+      - station_id=10
+    depends_on:
+      - kafka
+
+  central_station:
+    container_name: central_station
+    image: central_station_image
+    ports:
+      - "8093:8093"
+    volumes:
+      - parquet_storage:/parquetFiles
+      - bitcask_storage:/bitcaskDisk
+    environment:
+      - topic_name=weather-events
+      - parquet_files_path=/parquetFiles
+      - bitcask_files_path=/bitcaskDisk
+    depends_on:
+      - kafka
+
+  elasticsearch_loader:
+    container_name: elasticsearch_loader
+    image: elasticsearch_image
+    ports:
+      - "8094:8094"
+    environment:
+      - parquet_path=/parquetFiles
+    volumes:
+      - parquet_storage:/parquetFiles
+    depends_on:
+      - elasticsearch-kibana
+
+volumes:
+  zookeeper_data:
+  kafka_data:
+  parquet_storage:
+  bitcask_storage:

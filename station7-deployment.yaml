@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: station7
+  name: station7
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: station7
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: station7
+    spec:
+      containers:
+        - env:
+            - name: station_id
+              value: "7"
+            - name: topic_name
+              value: weather-events
+          image: weather_station_image
+          name: station-7
+          ports:
+            - containerPort: 8089
+          resources: {}
+      restartPolicy: Always
+status: {}

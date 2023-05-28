@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: elasticsearch-loader
+  name: elasticsearch-loader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: elasticsearch-loader
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: elasticsearch-loader
+    spec:
+      containers:
+        - env:
+            - name: parquet_path
+              value: /parquetFiles
+          image: elasticsearch_image
+          name: elasticsearch-loader
+          ports:
+            - containerPort: 8094
+          resources: {}
+          volumeMounts:
+            - mountPath: /parquetFiles
+              name: parquet-storage
+      restartPolicy: Always
+      volumes:
+        - name: parquet-storage
+          persistentVolumeClaim:
+            claimName: parquet-storage
+status: {}

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: elasticsearch-loader
+  name: elasticsearch_loader
+spec:
+  ports:
+    - name: "8094"
+      port: 8094
+      targetPort: 8094
+  selector:
+    io.kompose.service: elasticsearch-loader
+status:
+  loadBalancer: {}

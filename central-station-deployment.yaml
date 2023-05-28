@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: central-station
+  name: central-station
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: central-station
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: central-station
+    spec:
+      containers:
+        - env:
+            - name: bitcask_files_path
+              value: /bitcaskDisk
+            - name: parquet_files_path
+              value: /parquetFiles
+            - name: topic_name
+              value: weather-events
+          image: central_station_image
+          name: central-station
+          ports:
+            - containerPort: 8093
+          resources: {}
+          volumeMounts:
+            - mountPath: /parquetFiles
+              name: parquet-storage
+            - mountPath: /bitcaskDisk
+              name: bitcask-storage
+      restartPolicy: Always
+      volumes:
+        - name: parquet-storage
+          persistentVolumeClaim:
+            claimName: parquet-storage
+        - name: bitcask-storage
+          persistentVolumeClaim:
+            claimName: bitcask-storage
+status: {}
